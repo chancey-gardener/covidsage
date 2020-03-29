@@ -1,0 +1,1 @@
+{"0": "O", "1": "B-location", "10": "I-target", "11": "U-target", "12": "L-target", "2": "I-location", "3": "U-location", "4": "L-location", "5": "B-role", "6": "I-role", "7": "U-role", "8": "L-role", "9": "B-target"}

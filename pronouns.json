@@ -1,0 +1,90 @@
+{ 
+	"NOUN" :{
+		"we": {
+			"number": "plural",
+			"person": "first",
+			"case": "nominative",
+			"gender": null
+		},
+		"i": {
+			"number": "singular",
+			"person": "first",
+			"case": "nominative",
+			"gender": null
+		},
+		"us": {
+			"number": "plural",
+			"person": "first",
+			"case": "accusative",
+			"gender": null
+		},
+		"mine": {
+			"number": "singular",
+
+		},
+		"you": {
+			"number": "singular|plural",
+			"case": "nominative|indicative",
+			"person": "second" 
+		},
+		"it": {
+			"number": "singular",
+			"case": "nominative|indicative",
+			"person": "third",
+			"gender": null
+		},
+		"she": {
+			"number": "singular",
+			"case": "nominative",
+			"person": "third",
+			"gender": "feminine"
+
+		},
+		"he": {
+			"number": "singular",
+			"case": "nominative",
+			"person": "third",
+			"gender": "masculine"
+		},
+		"me": {
+			"number": "singular",
+			"case": "indicative",
+			"person": "first",
+			"gender": null
+		}
+	},
+	"DET": {
+			"my": {
+				"number": "singular",
+				"case": "genitive",
+				"person": "first",
+				"gender": null
+			},
+			"your": {
+				"number": "singular",
+				"case": "genitive",
+				"person": "second",
+				"gender": null
+			},
+		"his": {
+			"number": "singular",
+			"case": "genitive",
+			"gender": null
+		},
+		"her": {
+			"number": "singular",
+			"case": "genitive",
+			"gender": null
+		},
+		"their": {
+			"number": "singular|plural",
+			"case": "genitive",
+			"gender": null
+		},
+		"our": {
+			"number": "plural",
+			"case": "genitive",
+			"gender": null
+		}
+	}
+}
