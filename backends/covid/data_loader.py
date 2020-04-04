@@ -13,6 +13,7 @@ from os import path
 from os import listdir as ls
 #import progressbar
 from unicodedata import normalize
+#from utils import *
 
 
 VERBOSE = False
@@ -51,11 +52,13 @@ SCHEMA = {
 
 }
 
-with open(path.join('crosswalks', 'states_to_abbreviations.json')) as jfile:
+PROJECT_ROOT = '/home/chanceygardener/projects/sage/backends/covid'
+
+with open(path.join(PROJECT_ROOT, 'crosswalks', 'states_to_abbreviations.json')) as jfile:
     # maps us states to abbreviations since these
     # aren't uniformly represented in the same way
     STATES_TO_ABBREVIATIONS = json.loads(jfile.read())
-with open(path.join('crosswalks', 'metro_to_counties.json')) as jfile:
+with open(path.join(PROJECT_ROOT, 'crosswalks', 'metro_to_counties.json')) as jfile:
     # Crosswalk from city keywords to list of counties
     # if they are only represented as such in the dataset
     SPECIAL_METRO_AREAS = json.loads(jfile.read())
@@ -298,6 +301,16 @@ def write_csv(opath, dat, headers=None):
     print("wrote data to {}".format(opath + ".csv"))
 
 
+def safe_execute(query):
+    try:
+        query_ex = c.execute(query)
+    except sqlite3.OperationalError as e:
+        print(query)
+        raise sqlite3.OperationalError(e)
+    dat = query_ex.fetchall()
+    return dat
+
+
 def generate_row_from_schema(dat):
     frame = [None] * len(SCHEMA)
     for value in SCHEMA:
@@ -372,8 +385,8 @@ def qwrap(string_list):
     return ["'{}'".format(i) for i in string_list]
 
 
-def query_by(city_counties=None, province_states=None,
-             countries=None, special_metro_areas=None):
+def query_by_location(city_counties=None, province_states=None,
+                      countries=None, special_metro_areas=None):
     headers = ['record_date', 'country', 'province_state',
                'city_county', 'confirmed', 'deaths', 'recovered']
     query_frame = """SELECT DISTINCT record_date, country, province_state,
@@ -391,7 +404,7 @@ def query_by(city_counties=None, province_states=None,
             if lookup:
                 mc += lookup
             else:
-                print("warning metro area not found: {}".format(metro)) 
+                print("warning metro area not found: {}".format(metro))
         city_counties = mc if not city_counties else mc + city_counties
     if countries:
         countries = qwrap(countries)
@@ -406,7 +419,7 @@ def query_by(city_counties=None, province_states=None,
         city_county_statement = None
     if province_states:
         province_state_statement = "province_state in ({})".format(
-            ", ".join(province_states))
+            ", ".join(qwrap(province_states)))
     else:
         province_state_statement = None
     # TODO: date range specification
@@ -417,37 +430,94 @@ def query_by(city_counties=None, province_states=None,
                 if state]
     where_clause = where_frame + " and ".join(criteria)
     query = query_frame.format(where_clause)
-    try:
-        query_ex = c.execute(query)
-    except sqlite3.OperationalError as e:
-        print(query)
-        raise sqlite3.OperationalError(e)
-    dat = query_ex.fetchall()
+    dat = safe_execute(query)
+
     return dat
 
 
+def get_list(count, refer_by='city_county',
+             count_by='confirmed', get_less_than=False):
+    query = """
+                SELECT DISTINCT {} from daily_instance
+                where {} {} {} and {} != 'null';
+    """.format(refer_by,
+               count_by,
+               '>=' if not get_less_than else '<=',
+               count, refer_by)
+    return safe_execute(query)
 
-#### INIT test code
+
+def get_stat(stat_descriptors,
+             city_county,
+             province_state,
+             country, calc=lambda x: x, date = 'TODAY'):
+    query = """SELECT  confirmed, deaths from daily_instance
+            where city_county like '{}' 
+            and province_state like '{}' 
+            and country like '{}'
+            order by record_date desc limit 1""".format(city_county,
+                                                        province_state,
+                                                        country)
+    stats = safe_execute(query)[0]
+    # calc should take the same number of arguments as elements in stats
+    return calc(*stats)
+
+
+def death_rate(city_county, province_state, country, date='TODAY'):
+    return get_stat(['confirmed', 'deaths'],
+                    city_county, province_state, country,
+                    calc=lambda c, d: round(c/d, 3), date=date)
+
+
+def covid_cases(city_county, province_state, country, date='TODAY'):
+    return get_stat(['confirmed'], city_county,
+                    province_state, country, date=date)
+    
+
+def disambiguate(name):
+    possible_us_state = STATES_TO_ABBREVIATIONS.get(capitalize(name))
+    query = """SELECT DISTINCT city_county, province_state, country
+        from daily_instance
+        where city_county like '{}' or country like '{}'
+         or province_state like '{}'
+        """.format(name, name, name)
+    if possible_us_state:
+        query += " or province_state like '{}'".format(possible_us_state)
+    odat = safe_execute(query)
+    return odat
+
+
 main(DATAPATH)
 
-query = """SELECT DISTINCT record_date, province_state,
-            city_county, confirmed, deaths, recovered 
-            from daily_instance 
-            where country == 'US'
-            ORDER by datetime(record_date), province_state, city_county;"""
-headers = ['date', 'province_state', 'city_county',
-           'confirmed', 'deaths', 'recovered']
+if __name__ == "__main__":
+    # INIT test code
 
-query_ex = c.execute(query)
-qdat = query_ex.fetchall()
+    query = """SELECT DISTINCT record_date, province_state,
+                city_county, confirmed, deaths, recovered 
+                from daily_instance 
+                where country == 'US'
+                ORDER by datetime(record_date), province_state, city_county;"""
+    headers = ['date', 'province_state', 'city_county',
+               'confirmed', 'deaths', 'recovered']
 
-write_csv('test_query_dat', qdat, headers=headers)
+    #query_ex = c.execute(query)
+    #qdat = query_ex.fetchall()
 
+    #write_csv('test_query_dat', qdat, headers=headers)
 
+    #bay_test = query_by_location(special_metro_areas=['Bay Area'])
+    #allegheny_test = query_by_location(city_counties=['Allegheny'])
 
-bay_test = query_by(special_metro_areas=['Bay Area']
-    )
+    bt_headers = ['record_date', 'country', 'province_state',
+                  'city_county', 'confirmed', 'deaths', 'recovered']
+    #write_csv("bay_area_test", bay_test, headers=bt_headers)
+    #write_csv("county_test", allegheny_test, bt_headers)
 
-bt_headers = ['record_date', 'country', 'province_state',
-               'city_county', 'confirmed', 'deaths', 'recovered']
-write_csv("bay_area_test", bay_test, headers=bt_headers)
+    #test_list = get_list(100)
+    # print(test_list)
+    this = disambiguate("san mateo county")
+    print(this)
+    selection = this[0]
+
+    dr = death_rate(*selection)
+    print("death rate: {}%".format(dr * 100))

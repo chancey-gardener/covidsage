@@ -1,5 +1,4 @@
 {
-	
 	"Pittsburgh": [ "Allegheny",
 		 "Armstrong",
 		 "Beaver",
@@ -28,13 +27,16 @@
 		 "Warren",
 		 "Washington",
 		 "Westmoreland"],
-	"Philadelphia": [
+	"Philadelphia": {
+		"state": "PA",
+		"counties": [
 		"Bucks",
 		"Chester",
 		"Delaware",
 		"Montgomery",
 		"Philadelphia"
-	],
+	]
+	},
 	"Bay Area": [
 		"Alameda",
 		"Contra Costa",
@@ -54,5 +56,15 @@
 		"Santa Clara County",
 		"Solano County",
 		"Sonoma County"
+	],
+	"Chicago": {
+		"state": "IL",
+		"counties": [
+		"Cook",
+		"DuPage",
+		"Kane",
+		"Lake",
+		""
 	]
+	}
 }

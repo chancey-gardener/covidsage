@@ -74,3 +74,12 @@ record_date,country,province_state,city_county,confirmed,deaths,recovered
 2020-03-27 22:14:55,US,CA,Santa Clara,574.0,20.0,0.0
 2020-03-27 22:14:55,US,CA,Solano,34.0,0.0,0.0
 2020-03-27 22:14:55,US,CA,Sonoma,44.0,1.0,0.0
+2020-03-28 23:05:37,US,CA,Alameda,220.0,4.0,0.0
+2020-03-28 23:05:37,US,CA,Contra Costa,168.0,2.0,0.0
+2020-03-28 23:05:37,US,CA,Marin,68.0,1.0,0.0
+2020-03-28 23:05:37,US,CA,Napa,9.0,0.0,0.0
+2020-03-28 23:05:37,US,CA,San Francisco,308.0,4.0,0.0
+2020-03-28 23:05:37,US,CA,San Mateo,274.0,6.0,0.0
+2020-03-28 23:05:37,US,CA,Santa Clara,591.0,25.0,0.0
+2020-03-28 23:05:37,US,CA,Solano,34.0,0.0,0.0
+2020-03-28 23:05:37,US,CA,Sonoma,50.0,1.0,0.0

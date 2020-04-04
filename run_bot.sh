@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+# tell 
+#prctl(PR_SET_PDEATHSIG, SIGHUP);
 
 while getopts ":t" opt; do
 	case ${opt} in
@@ -20,5 +22,9 @@ if [[ -z models ]] ; then
 fi
 
 rasa run --enable-api -m 'models/nlu.tar.gz' &
-echo "Rasa nlu server running (PID: $!) on localhost:5005";
+nlu_server_pid=$!
+echo "Rasa nlu server running (PID: $nlu_server_pid) on localhost:5005";
+
+python3 intent_handling.py
+kill $nlu_server_pid
 
