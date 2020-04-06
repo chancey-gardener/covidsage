@@ -11,9 +11,9 @@ import re
 from itertools import chain
 from os import path
 from os import listdir as ls
-#import progressbar
+# import progressbar
 from unicodedata import normalize
-#from utils import *
+from backends.covid.utils import *
 
 
 VERBOSE = False
@@ -73,10 +73,10 @@ class InvalidDateFormatError(Exception):
 
 
 INIT_DB_QUERY = """CREATE TABLE daily_instance
-                    (record_date text, city_county text, 
-                    province_state text, country text, 
+                    (record_date text, city_county text,
+                    province_state text, country text,
                      confirmed real, deaths real,
-                      recovered real,  active real, 
+                      recovered real,  active real,
                       longitude real, latitude real);
                  """
 
@@ -116,16 +116,16 @@ def process_combinedkey(k):
     out = [None, None, None]
     seq = [e.strip() for e in k.split(',')]
     out[-1] = seq[-1]
-    #out[-1] = seq[0]
+    # out[-1] = seq[0]
     if len(seq) == 2:
         out[1] = seq[0]
-        #out[-1] = seq[-1]
+        # out[-1] = seq[-1]
     elif len(seq) == 3:
         out[0], out[1] = seq[0], seq[1]
     elif len(seq) > 3:
         raise CsvFormatError("unrecognized combined key")
     return out
-    #out[-1] = seq[-1]
+    # out[-1] = seq[-1]
 
 
 def normalize_state(state_string):
@@ -217,7 +217,7 @@ def process_coarse_schema(datarow):
         # print(province_state)
         province_state = normalize_state(
             province_state) if province_state.strip() else None
-        #print(province_state, "\n")
+        # print(province_state, "\n")
     country = datarow[coarse_schema.index(b"Country/Region")]
     active = None
     date_val = datarow[coarse_schema.index(b"Last Update")].strip()
@@ -253,8 +253,8 @@ def escape_char(string):
 
 
 def generate_insert_query(datarow):
-    query_frame = """INSERT INTO daily_instance 
-                    (rowid, record_date, city_county, 
+    query_frame = """INSERT INTO daily_instance
+                    (rowid, record_date, city_county,
                     province_state, country,
                     confirmed, deaths, recovered,
                     active, longitude, latitude)
@@ -390,8 +390,8 @@ def query_by_location(city_counties=None, province_states=None,
     headers = ['record_date', 'country', 'province_state',
                'city_county', 'confirmed', 'deaths', 'recovered']
     query_frame = """SELECT DISTINCT record_date, country, province_state,
-            city_county, confirmed, deaths, recovered 
-            from daily_instance 
+            city_county, confirmed, deaths, recovered
+            from daily_instance
             {}
             ORDER by datetime(record_date), province_state, city_county;"""
     where_frame = "where "
@@ -450,29 +450,33 @@ def get_list(count, refer_by='city_county',
 def get_stat(stat_descriptors,
              city_county,
              province_state,
-             country, calc=lambda x: x, date = 'TODAY'):
-    query = """SELECT  confirmed, deaths from daily_instance
-            where city_county like '{}' 
-            and province_state like '{}' 
+             country, calc=lambda x: x, date='TODAY',
+             debug=False):
+    query = """SELECT {} from daily_instance
+            where city_county like '{}'
+            and province_state like '{}'
             and country like '{}'
-            order by record_date desc limit 1""".format(city_county,
+            order by record_date desc limit 1""".format(", ".join(stat_descriptors),
+                                                        city_county,
                                                         province_state,
                                                         country)
     stats = safe_execute(query)[0]
     # calc should take the same number of arguments as elements in stats
+    if debug:
+        print(stats)
     return calc(*stats)
 
 
 def death_rate(city_county, province_state, country, date='TODAY'):
-    return get_stat(['confirmed', 'deaths'],
+    return get_stat(['deaths', 'confirmed'],
                     city_county, province_state, country,
-                    calc=lambda c, d: round(c/d, 3), date=date)
+                    calc=safedivForRatio, date=date)
 
 
 def covid_cases(city_county, province_state, country, date='TODAY'):
     return get_stat(['confirmed'], city_county,
                     province_state, country, date=date)
-    
+
 
 def disambiguate(name):
     possible_us_state = STATES_TO_ABBREVIATIONS.get(capitalize(name))
@@ -493,27 +497,27 @@ if __name__ == "__main__":
     # INIT test code
 
     query = """SELECT DISTINCT record_date, province_state,
-                city_county, confirmed, deaths, recovered 
-                from daily_instance 
+                city_county, confirmed, deaths, recovered
+                from daily_instance
                 where country == 'US'
                 ORDER by datetime(record_date), province_state, city_county;"""
     headers = ['date', 'province_state', 'city_county',
                'confirmed', 'deaths', 'recovered']
 
-    #query_ex = c.execute(query)
-    #qdat = query_ex.fetchall()
+    # query_ex = c.execute(query)
+    # qdat = query_ex.fetchall()
 
-    #write_csv('test_query_dat', qdat, headers=headers)
+    # write_csv('test_query_dat', qdat, headers=headers)
 
-    #bay_test = query_by_location(special_metro_areas=['Bay Area'])
-    #allegheny_test = query_by_location(city_counties=['Allegheny'])
+    # bay_test = query_by_location(special_metro_areas=['Bay Area'])
+    # allegheny_test = query_by_location(city_counties=['Allegheny'])
 
     bt_headers = ['record_date', 'country', 'province_state',
                   'city_county', 'confirmed', 'deaths', 'recovered']
-    #write_csv("bay_area_test", bay_test, headers=bt_headers)
-    #write_csv("county_test", allegheny_test, bt_headers)
+    # write_csv("bay_area_test", bay_test, headers=bt_headers)
+    # write_csv("county_test", allegheny_test, bt_headers)
 
-    #test_list = get_list(100)
+    # test_list = get_list(100)
     # print(test_list)
     this = disambiguate("san mateo county")
     print(this)

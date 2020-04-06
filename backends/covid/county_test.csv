@@ -1,0 +1,8 @@
+record_date,country,province_state,city_county,confirmed,deaths,recovered
+2020-03-22T23:45:00,US,PA,Allegheny,40.0,1.0,0.0
+2020-03-23 23:19:34,US,PA,Allegheny,48.0,1.0,0.0
+2020-03-24 23:37:31,US,PA,Allegheny,58.0,2.0,0.0
+2020-03-25 23:33:19,US,PA,Allegheny,88.0,2.0,0.0
+2020-03-26 23:48:35,US,PA,Allegheny,133.0,2.0,0.0
+2020-03-27 22:14:55,US,PA,Allegheny,158.0,2.0,0.0
+2020-03-28 23:05:37,US,PA,Allegheny,219.0,2.0,0.0

@@ -76,6 +76,12 @@
 - covid 19 cases in [Taos](area)?
 - How many people had coronavirus in [Beijing](area) on [February 2nd, 2020](date)?
 - How many covid cases were confirmed in [New York City](area) [yesterday](date)?
+- How many confirmed cases of covid in [Italy](area)?
+- Can I get a count of confirmed cases in [London](area)?
+- Do you know the number of confirmed coronavirus cases in [California](area)
+- Tell me the confirmed case count for COVID-19 in [Brazil](area)
+- I want to know how many people are confirmed to have covid in [San Francisco](area)
+- What's the confirmed case count for coronavirus in [Pittsburgh](area)?
 
 ## intent: covid_growthcurve
 - Show me the growth curve for [confirmed cases](data_type) in [New York City](area), [The Bay Area](area), and [Denver](area)

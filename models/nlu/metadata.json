@@ -124,6 +124,8 @@
             "entity_recognition": true,
             "use_masked_language_model": false,
             "BILOU_flag": true,
+            "tensorboard_log_directory": null,
+            "tensorboard_log_level": "epoch",
             "name": "DIETClassifier",
             "file": "component_6_DIETClassifier",
             "class": "rasa.nlu.classifiers.diet_classifier.DIETClassifier"
@@ -174,7 +176,7 @@
             "use_maximum_negative_similarity": true,
             "scale_loss": true,
             "regularization_constant": 0.002,
-            "weight_sparsity": 0.8,
+            "weight_sparsity": 0.0,
             "negative_margin_scale": 0.8,
             "drop_rate": 0.2,
             "drop_rate_attention": 0,
@@ -183,6 +185,8 @@
             "evaluate_on_number_of_examples": 0,
             "use_masked_language_model": false,
             "retrieval_intent": null,
+            "tensorboard_log_directory": null,
+            "tensorboard_log_level": "epoch",
             "name": "ResponseSelector",
             "intent_classification": true,
             "entity_recognition": false,
@@ -191,6 +195,6 @@
             "class": "rasa.nlu.selectors.response_selector.ResponseSelector"
         }
     ],
-    "trained_at": "20200322-162805",
-    "rasa_version": "1.8.2"
+    "trained_at": "20200405-152935",
+    "rasa_version": "1.9.5"
 }
